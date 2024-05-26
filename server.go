@@ -14,10 +14,9 @@ import (
 )
 
 const (
-	ipv4mdns              = "224.0.0.251"
-	ipv6mdns              = "ff02::fb"
-	mdnsPort              = 5353
-	forceUnicastResponses = false
+	ipv4mdns = "224.0.0.251"
+	ipv6mdns = "ff02::fb"
+	mdnsPort = 5353
 )
 
 var (
@@ -47,6 +46,9 @@ type Config struct {
 
 	// Logger can optionally be set to use an alternative logger instead of the default.
 	Logger *log.Logger
+
+	// ForceUnicastResponses forces the server to respond to all queries over unicast.
+	ForceUnicastResponses bool
 }
 
 // mDNS server is used to listen for mDNS queries and respond if we
@@ -271,7 +273,7 @@ func (s *Server) handleQuestion(q dns.Question) (multicastRecs, unicastRecs []dn
 	//     In the Question Section of a Multicast DNS query, the top bit of the
 	//     qclass field is used to indicate that unicast responses are preferred
 	//     for this particular question.  (See Section 5.4.)
-	if q.Qclass&(1<<15) != 0 || forceUnicastResponses {
+	if q.Qclass&(1<<15) != 0 || s.config.ForceUnicastResponses {
 		return nil, records
 	}
 	return records, nil
