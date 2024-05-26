@@ -292,9 +292,17 @@ func (s *Server) sendResponse(resp *dns.Msg, from net.Addr, unicast bool) error 
 	addr := from.(*net.UDPAddr)
 	if addr.IP.To4() != nil {
 		_, err = s.ipv4List.WriteToUDP(buf, addr)
+		if err != nil {
+			return err
+		}
+		_, err = s.ipv4List.WriteToUDP(buf, ipv4Addr)
 		return err
 	} else {
 		_, err = s.ipv6List.WriteToUDP(buf, addr)
+		if err != nil {
+			return err
+		}
+		_, err = s.ipv6List.WriteToUDP(buf, ipv6Addr)
 		return err
 	}
 }
